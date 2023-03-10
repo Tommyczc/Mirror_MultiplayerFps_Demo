@@ -14854,6 +14854,7 @@ GameObject:
   - component: {fileID: 1249918908}
   - component: {fileID: 1249918907}
   - component: {fileID: 1249918906}
+  - component: {fileID: 1249918909}
   m_Layer: 3
   m_Name: floor
   m_TagString: Untagged
@@ -14940,6 +14941,18 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1249918904}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!156049354 &1249918909
+Grid:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249918904}
+  m_Enabled: 1
+  m_CellSize: {x: 10, y: 10, z: 10}
+  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellLayout: 0
+  m_CellSwizzle: 0
 --- !u!1001 &1254979298
 PrefabInstance:
   m_ObjectHideFlags: 0
