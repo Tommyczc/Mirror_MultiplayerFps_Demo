@@ -704,6 +704,7 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 8
+  maxSlopeAngle: 50
   activeGrapple: 0
   grappleFov: 95
   lookCamera: {fileID: 4056307809881863916}
@@ -763,6 +764,9 @@ MonoBehaviour:
   weapons:
   - {fileID: 4423370222432793574, guid: 9b864360880dc304ea62eb2b637ef27b, type: 3}
   - {fileID: 7872996335646132546, guid: ae7121eb7ddd22f4ea2a1efbb0c83522, type: 3}
+  weaponPickUpDictionary:
+  - {fileID: 4120771171582026541, guid: 2157bad3b49782648a8dea592fd362a3, type: 3}
+  - {fileID: 4120771171582026541, guid: 6463dc83f4da9114c8268da2d00cd631, type: 3}
   initialWeapons: []
   hitLayer:
     serializedVersion: 2

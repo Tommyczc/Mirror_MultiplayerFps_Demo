@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TerrainUtils;
 
@@ -12,10 +13,15 @@ public class NetworkSpawner : NetworkBehaviour
     public float highOfFloat;
 
     public float rotationSpeed;
+
+    [HideInInspector]
+    [SyncVar]
+    public bool isInstantiated=false;
+    
     // Start is called before the first frame update
-    private void OnValidate()
+    public virtual void OnValidate()
     {
-        GetComponent<NetworkIdentity>().serverOnly = true;
+        //GetComponent<NetworkIdentity>().serverOnly = true;
         // if (!MyNetworkManager.singleton.spawnPrefabs.Contains(objectSpawn))
         // {
         //     MyNetworkManager.singleton.spawnPrefabs.Add(objectSpawn);
@@ -38,7 +44,12 @@ public class NetworkSpawner : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public virtual void Update()
+    {
+        
+    }
+
+    public virtual void Awake()
     {
         
     }
@@ -50,7 +61,17 @@ public class NetworkSpawner : NetworkBehaviour
             objectSpawn.GetComponent<Rigidbody>().isKinematic = true;
         var spawnPosition = transform.position;
         var spawnRotation = transform.rotation;
-        GameObject test=Instantiate(objectSpawn,spawnPosition,spawnRotation);
+        
+        GameObject test = null;
+        if (!isInstantiated)
+        {
+            test = Instantiate(objectSpawn, spawnPosition, spawnRotation);
+        }
+        else
+        {
+            test = objectSpawn;
+        }
+
         NetworkServer.Spawn(
             test
         );

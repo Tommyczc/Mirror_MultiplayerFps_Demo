@@ -68,6 +68,7 @@ public class PlayerInteraction : NetworkBehaviour
     
     private void OnInteract(InputAction.CallbackContext ctx)
     {
+        if (_currentIndex == -1) return;
         activeInteractables[_currentIndex].GetComponent<BaseInteractable>().OnInteract(gameObject);
     }
 

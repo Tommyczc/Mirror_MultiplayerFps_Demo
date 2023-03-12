@@ -1,9 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using Cinemachine;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
 using Random = UnityEngine.Random;
 
 public class WeaponController : NetworkBehaviour
@@ -19,6 +21,7 @@ public class WeaponController : NetworkBehaviour
 
     [Tooltip("Attach your weapons in order depending of their ID")]
     public GameObject[] weapons;
+    public GameObject[] weaponPickUpDictionary;
 
     public Weapon_SO[] initialWeapons;
 
@@ -36,6 +39,8 @@ public class WeaponController : NetworkBehaviour
     public Transform cameraPivot;
 
     private Transform[] firePoint;
+
+    
 
     [Tooltip("Attach your weapon holder")] public Transform weaponHolder;
 
@@ -89,7 +94,7 @@ public class WeaponController : NetworkBehaviour
     private void LateUpdate()
     {
         if (!isLocalPlayer) return;
-        if (Mouse.current.leftButton.isPressed) //按下鼠标左键
+        if (_inputModule.isPressed("Interaction/Fire(click)") ) //按下鼠标左键
             if(weapon!=null&&currentWeapon!=0&&weapon.shootMethod==ShootingMethod.HoldAndRelease)
             {
                 shoot(default);
@@ -350,6 +355,11 @@ public class WeaponController : NetworkBehaviour
     IEnumerator swapWeapon(WeaponPickable newId)
     {
         if (newId == null) yield break;
+        
+        //delete last weapon
+        destroyCurrentWeapon();
+        
+        //for swapping
         Debug.Log($"Swapping weapon {newId.weapon.weaponID}");
         foreach (GameObject weaponPrefab in weapons)
         {
@@ -370,32 +380,72 @@ public class WeaponController : NetworkBehaviour
                 firePoint=weaponIn.GetComponent<WeaponIdentification>().FirePoint;
                 id = weaponIn.GetComponent<WeaponIdentification>();
                 
-                if(isLocalPlayer)
+                yield return null;
+
+                if (isLocalPlayer)
+                {
                     if (weapon.shootMethod == ShootingMethod.Press)
                     {
                         _inputModule.BindPerformedAction("Interaction/Fire(click)", shoot);
                     }
 
-                yield return null;
-                NetworkServer.Destroy(newId.gameObject);
+                    newId.CmdDestroyThisObject();
+                }
+
+                break;
             }
         }
         yield return null;
     }
 
-    // void testMouse(InputAction.CallbackContext ctx)
-    // {
-    //     Debug.Log("left mouse");
-    // }
+    void destroyCurrentWeapon()
+    {
+        if (id != null)
+        {
+            Debug.Log("delete weapon prefab");
+            Destroy(id.gameObject);
+        }
+    }
+
 
     [Command]
     public void CmdChangeWeaponIdentification(WeaponPickable newPickUp)
     {
+        //for drop weapon
+        Debug.Log($"dropping weapon");
+        //RpcDestroyCurrentWeapon();
+
         pickUp = newPickUp;
     }
 
     [Command]
-    public void CmdDropWEapon()
+    public void CmdDropWeapon()
     {
+        RpcDestroyCurrentWeapon();
+        // GameObject thePickUp=null;
+        // foreach (GameObject pickup in weaponPickUpDictionary)
+        // {
+        //     if (pickup.GetComponent<WeaponPickable>().weapon.weaponID == weapon.weaponID)
+        //     {
+        //         thePickUp = pickup;
+        //         break;
+        //     }
+        // }
+        //
+        // if (thePickUp != null)
+        // {
+        //     thePickUp = Instantiate(thePickUp);
+        //     WeaponPickable pick = thePickUp.GetComponent<WeaponPickable>();
+        //     pick.currentBullets = id.currentBullets;
+        //     pick.currentMagazineSize = id.currentMagazineSize;
+        //     Debug.Log("shfhs");
+        //     NetworkServer.Spawn(thePickUp);
+        // }
+    }
+
+    [ClientRpc]
+    void RpcDestroyCurrentWeapon()
+    {
+        destroyCurrentWeapon();
     }
 }

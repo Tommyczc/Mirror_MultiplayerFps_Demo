@@ -13,6 +13,7 @@ public class Bullet : NetworkBehaviour
     public float speed,damage;
 
     [HideInInspector]
+    [SyncVar]
     public Vector3 destination;
     
     [HideInInspector]
@@ -24,6 +25,7 @@ public class Bullet : NetworkBehaviour
     public bool hurtsPlayer;
 
     [HideInInspector]
+    [SyncVar]
     public bool explosionOnHit;
 
     [HideInInspector] public GameObject explosionVFX;
@@ -41,7 +43,7 @@ public class Bullet : NetworkBehaviour
     private void Start()
     {
         transform.LookAt(destination);
-        Invoke("CmdDestroyProjectile", duration);
+        Invoke("DestroyProjectile", duration);
     }
     private void Update() => transform.Translate(0.0f, 0.0f, speed * Time.deltaTime);
 
@@ -59,10 +61,10 @@ public class Bullet : NetworkBehaviour
 
         if (!explosionOnHit)
         {
-            if (other.tag == "Critical" && !hit)
+            if (other.tag == "Player" && !hit)
             {
-                other.transform.parent.GetComponent<IDamageable>().Damage(damage * criticalMultiplier);
-                CmdDestroyProjectile();
+                other.GetComponent<IDamageable>().Damage(damage * criticalMultiplier);
+                DestroyProjectile();
                 hit = true;
                 return;
             }
@@ -70,7 +72,7 @@ public class Bullet : NetworkBehaviour
             if (other.GetComponent<IDamageable>() != null && !hit && other.tag != "Player")
             {
                 other.GetComponent<IDamageable>().Damage(damage);
-                CmdDestroyProjectile();
+                DestroyProjectile();
                 hit = true;
                 return;
             }
@@ -86,12 +88,11 @@ public class Bullet : NetworkBehaviour
 
         if (other.gameObject.layer == 3 || other.gameObject.layer == 8 || other.gameObject.layer == 10
             || other.gameObject.layer == 11 || other.gameObject.layer == 12 || other.gameObject.layer == 13 ||
-            other.gameObject.layer == 7) CmdDestroyProjectile(); // Whenever it touches ground / object layer
+            other.gameObject.layer == 7) DestroyProjectile(); // Whenever it touches ground / object layer
         
     }
     
-    [Command(requiresAuthority = false)]
-    private void CmdDestroyProjectile()
+    private void DestroyProjectile()
     {
         if (explosionOnHit)
         {
@@ -131,5 +132,6 @@ public class Bullet : NetworkBehaviour
         Destroy();
     }
     
+    [Command(requiresAuthority = false)]
     private void Destroy() => NetworkServer.Destroy(this.gameObject);
 }

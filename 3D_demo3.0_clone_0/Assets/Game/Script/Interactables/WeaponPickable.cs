@@ -25,6 +25,7 @@ public class WeaponPickable : BaseInteractable
     public int weaponId;
     private GameObject weaponIn;
 
+    [Header("Whether Destroyable")]
     [SyncVar] public bool allowToDestroy;
     
     private void OnValidate()
@@ -34,6 +35,7 @@ public class WeaponPickable : BaseInteractable
     public override void Start()
     {
         base.Start();
+        displayName = $"Pick Up Weapon <color=red> {weapon._name} </color>";
         weaponIn=Instantiate(weapon.pickUpGraphics,transform,false);
     }
     // Start is called before the first frame update
@@ -45,7 +47,7 @@ public class WeaponPickable : BaseInteractable
     
     public override void OnInteract(GameObject fatherObject)
     {
-        AuthorityRequest(fatherObject);
+        //AuthorityRequest(fatherObject);
 
         if (fatherObject.tag == "Player" && fatherObject.GetComponent<WeaponController>() != null)
         {

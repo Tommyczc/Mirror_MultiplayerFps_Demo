@@ -58,7 +58,12 @@ public class InputModule : GameModule
     {
         _input.FindAction(inputName).canceled -= action;
     }
-    
+
+    public bool isPressed(string inputName)
+    {
+        return _input.FindAction(inputName).IsPressed();
+    }
+
     public void SetActionMapActive(string inputMapName, bool state)
     {
         InputActionMap targetMap = _input.asset.FindActionMap(inputMapName);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cinemachine;
 using Mirror;
 using UnityEngine;
@@ -49,11 +50,23 @@ public class PlayerMovement : NetworkBehaviour
     public float maxSlopeAngle;
     private RaycastHit slopeHit;
     private bool exitingSlope;
+
     
+    public bool activeGrapple
+    {
+        get { return activeGrapple;}
+        set { freeze = value; }
+    }
     [Header("Grappling")]
-    public bool activeGrapple;
     public float grappleFov = 70f;
 
+    [Header("Wall Runing")]
+    public bool wallrunning;
+
+    [Header("Ledge Grabbing")]
+    public bool unlimited;
+    public bool restricted;
+    
     [Header("Camera Limits")] 
     public GameObject lookCamera;
     public CinemachineVirtualCamera _camera;
@@ -90,7 +103,7 @@ public class PlayerMovement : NetworkBehaviour
     public Vector2 movementValue;
     public Vector2 lookValue;
     public bool isLocal = false;
-    //public bool freeze;
+    public bool freeze;
 
 
     void OnValidate()
@@ -342,7 +355,7 @@ public class PlayerMovement : NetworkBehaviour
      */
     private void ProcessMoving()
     {
-        if (activeGrapple) return;
+        if (freeze) return;
         movementValue = _movement.ReadValue<Vector2>();
         
         float targetSpeed = allowSprinting && _sprint ? sprintSpeed : moveSpeed;
@@ -392,6 +405,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
+    
     // private void speedControl()
     // {
     //     Vector3 flatVelocity = new Vector3(_rigidbody.velocity.x,0f,_rigidbody.velocity.z);
@@ -496,7 +510,7 @@ public class PlayerMovement : NetworkBehaviour
         velocityToSet = CalculateJumpVelocity(transform.position, targetPosition, trajectoryHeight);
         Invoke(nameof(SetVelocity), 0.1f);
 
-        Invoke(nameof(ResetRestrictions), 3f);
+        //Invoke(nameof(ResetRestrictions), 3f);
     }
     private Vector3 velocityToSet;
     private void SetVelocity()
@@ -508,7 +522,7 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     public void ResetRestrictions()
-    { 
+    {
         activeGrapple = false;
         _camera.m_Lens.FieldOfView=originFov;
     }
