@@ -896,7 +896,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
@@ -945,10 +945,10 @@ MonoBehaviour:
   wp: {fileID: 0}
   allowJumping: 1
   allowSprinting: 1
-  moveSpeed: 5
-  sprintSpeed: 8
+  moveSpeed: 4
+  sprintSpeed: 6
   rotationSpeed: 1
-  speedChangeRate: 10
+  speedChangeRate: 8
   readyToJump: 1
   jumpCd: 1.5
   jumpForce: 6
