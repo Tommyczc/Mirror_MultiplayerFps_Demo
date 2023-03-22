@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cab26836a8d9def41a6c477c026a9cb8, type: 3}
+  m_Name: TommyGun
+  m_EditorClassIdentifier: 
+  weaponID: 3
+  _name: 
+  pickUpGraphics: {fileID: 0}
+  icon: {fileID: 0}
+  shootStyle: 0
+  shootMethod: 1
+  holdProgressSpeed: 0
+  reloadStyle: 0
+  projectile: {fileID: 0}
+  projectileUsesGravity: 0
+  bulletDuration: 0
+  speed: 0
+  explosionOnHit: 0
+  hurtsPlayer: 0
+  explosionRadius: 0
+  explosionForce: 0
+  explosionVFX: {fileID: 0}
+  fireRate: 0
+  reloadTime: 0
+  infiniteBullets: 0
+  magazineSize: 0
+  bulletsPerFire: 0
+  ammoCostPerFire: 0
+  bulletRange: 0
+  timeBetweenShots: 0
+  penetrationAmount: 0
+  penetrationDamageReduction: 0
+  allowAim: 0
+  aimingPosition: {x: -1.5, y: 0.5, z: 0}
+  aimingRotation: {x: 0, y: 0, z: 0}
+  aimingSpeed: 0
+  aimingFOV: 0
+  movementSpeedWhileAiming: 0
+  setMovementSpeedWhileAiming: 0
+  crosshairResize: 0
+  crosshairPreset: {fileID: 0}
+  applyBulletSpread: 0
+  applyWeight: 0
+  spreadAmount: 0
+  aimSpreadAmount: 0
+  weightMultiplier: 1
+  applyRecoil: 0
+  recoilX:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  recoilY:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  xRecoilAmount: 0
+  yRecoilAmount: 0
+  recoilRelaxSpeed: 0
+  applyDifferentRecoilOnAiming: 0
+  xRecoilAmountOnAiming: 0
+  yRecoilAmountOnAiming: 0
+  damagePerBullet: 0
+  applyDamageReductionBasedOnDistance: 0
+  minimumDistanceToApplyDamageReduction: 0
+  damageReductionMultiplier: 0
+  criticalDamageMultiplier: 0
+  limitedMagazines: 0
+  totalMagazines: 0
+  showBulletShells: 0
+  bulletHoleImpact:
+    defaultImpact: {fileID: 0}
+    groundIMpact: {fileID: 0}
+    grassImpact: {fileID: 0}
+    enemyImpact: {fileID: 0}
+    metalImpact: {fileID: 0}
+    mudImpact: {fileID: 0}
+    woodImpact: {fileID: 0}
+  muzzleVFX: {fileID: 0}
+  bulletGraphics: {fileID: 0}
+  audioSFX:
+    firing: {fileID: 0}
+    holster: {fileID: 0}
+    unholster: {fileID: 0}
+    reload: {fileID: 0}
+    emptyMag: {fileID: 0}
+  camShakeAmount: 0
+  applyFOVEffectOnShooting: 0
+  FOVValue: 0
+  AimingFOVValue: 0
+  damagePerHit: 0
+  attackRate: 0
+  attackRange: 0
+  onHitEffect: 0
+  dontShowMagazine: 0
+  currentPreset: {fileID: 0}
+  presetName: 
