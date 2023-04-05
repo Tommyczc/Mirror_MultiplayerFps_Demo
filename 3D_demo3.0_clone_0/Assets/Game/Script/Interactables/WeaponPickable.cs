@@ -6,16 +6,21 @@ using UnityEngine;
 
 public class WeaponPickable : BaseInteractable
 {
-    public Weapon_SO weapon;
     [SyncVar]
+    public Weapon_SO weapon;
+
+    [SyncVar,HideInInspector] 
     public int totalMagazines,
-        magazineSize,
-        bulletsLeftInMagazine,
+        magazineSize;
+    [SyncVar]
+    public int  bulletsLeftInMagazine,
         totalBullets; // Internal use
     [HideInInspector]
     [SyncVar]
     public int weaponId;
     private GameObject weaponIn;
+
+    public bool isInitialWeapon;
 
     [Header("Whether Destroyable")]
     [SyncVar] public bool allowToDestroy;
@@ -30,8 +35,18 @@ public class WeaponPickable : BaseInteractable
         displayName = $"Pick Up Weapon <color=red> {weapon._name} </color>";
         weaponId = weapon.weaponID;
         weaponIn=Instantiate(weapon.pickUpGraphics,transform,false);
+
+        totalMagazines = weapon.totalMagazines;
+        magazineSize = weapon.magazineSize;
     }
-    // Start is called before the first frame update
+
+    public override void OnStartServer()
+    {
+        if (isInitialWeapon)
+        {
+            bulletsLeftInMagazine = magazineSize;
+        }
+    }
 
     // Update is called once per frame
     void Update()

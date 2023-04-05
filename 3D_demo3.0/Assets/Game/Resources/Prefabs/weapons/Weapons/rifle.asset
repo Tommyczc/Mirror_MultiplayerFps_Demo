@@ -21,7 +21,7 @@ MonoBehaviour:
   holdProgressSpeed: 0
   reloadStyle: 0
   projectile: {fileID: -5889836018353580991, guid: a274b75d3a6845942aa028024eaf770d, type: 3}
-  projectileUsesGravity: 0
+  projectileUsesGravity: 1
   bulletDuration: 5
   speed: 45
   explosionOnHit: 0

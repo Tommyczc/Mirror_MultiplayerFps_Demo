@@ -1,12 +1,12 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using Cinemachine;
 using Mirror;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
-using UnityEngine.PlayerLoop;
-using Random = UnityEngine.Random;
+using FixedUpdate = UnityEngine.PlayerLoop.FixedUpdate;
 
 public class WeaponController : NetworkBehaviour
 {
@@ -19,7 +19,7 @@ public class WeaponController : NetworkBehaviour
 
     [Tooltip("Attach your weapons in order depending of their ID")]
     public GameObject[] weapons;
-    public GameObject[] weaponPickUpDictionary;
+    public GameObject weaponPickUpPrefab;
 
     public Weapon_SO[] initialWeapons;
 
@@ -29,8 +29,17 @@ public class WeaponController : NetworkBehaviour
 
     // public UISlot[] slots;
 
+    [Header("Weapon UI")] 
+    public GameObject weaponUIObject;
+    public TMP_Text weaponTitle;
+    public TMP_Text bulletTMPText;
+    public GameObject weaponIcon;
+    public Sprite defaultIcon;
+
+    [Header("Weapon Object")]
     public Weapon_SO weapon;
 
+    [Header("Camera Limit")]
     [Tooltip("Attach your main camera")] public CinemachineVirtualCamera mainCamera;
 
     [Tooltip("Attach your camera pivot object")]
@@ -78,6 +87,10 @@ public class WeaponController : NetworkBehaviour
     [SerializeField]
     private bool weaponChanging;
 
+    private void OnValidate()
+    {
+        weaponUIObject.SetActive(false);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -90,10 +103,7 @@ public class WeaponController : NetworkBehaviour
     void Update()
     {
         if (!isLocalPlayer) return;
-        if (id != null)
-        {
-            HandleUI();
-        }
+        HandleUI();
     }
 
     private void LateUpdate()
@@ -199,7 +209,7 @@ public class WeaponController : NetworkBehaviour
                     int i = 0;  
                     while(i <bulletsPerFire)
                     {
-                        HitscanShot();
+                        HitScanShot();
                         // CamShake.instance.ShootShake(weapon.camShakeAmount);
                         // // Determine if we want to add an effect for FOV
                         // if (weapon.applyFOVEffectOnShooting)
@@ -292,12 +302,12 @@ public class WeaponController : NetworkBehaviour
     }
 
     [Command]
-    private void HitscanShot()
+    private void HitScanShot()
     {
         events.OnShoot.Invoke(); 
         // if (resizeCrosshair && crosshair != null ) crosshair.Resize(weapon.crosshairResize * 100);
 
-        Debug.Log($"HitscanShot start shooting");
+        Debug.Log($"HitScanShot start shooting");
         Transform hitObj; 
 
         //This defines the first hit on the object
@@ -478,6 +488,108 @@ public class WeaponController : NetworkBehaviour
         yield return null;
     }
 
+    public void UnHolster(GameObject weaponObj)
+    {
+        canShoot = true; 
+
+        weaponObj.SetActive(true);
+        id = weaponObj.GetComponent<WeaponIdentification>();
+        weapon = id.weapon;
+
+        weaponObj.GetComponent<Animator>().enabled = true;
+        // StartCoroutine(CowsinsUtilities.PlayAnim("unholster", inventory[currentWeapon].GetComponent<Animator>()));
+        // SoundManager.Instance.PlaySound(weapon.audioSFX.unholster, .1f, 0, 0);
+        //Invoke("FinishedSelection", .5f); 
+    }
+    
+    [HideInInspector]public bool selectingWeapon; 
+    private void FinishedSelection() => selectingWeapon = false;
+
+    public void StartReload() => StartCoroutine(Reload());
+    
+    private IEnumerator Reload()
+    {
+        events.OnReload.Invoke(); 
+        //SoundManager.Instance.PlaySound(weapon.audioSFX.reload, .1f, 0, 0);
+        reloading = true;
+        yield return new WaitForSeconds(.001f);
+
+
+        //StartCoroutine(CowsinsUtilities.PlayAnim("reloading", inventory[currentWeapon].GetComponent<Animator>()));
+
+        yield return new WaitForSeconds(weapon.reloadTime);
+
+        events.OnFinishReload.Invoke();
+
+        reloading = false;
+        canShoot = true; 
+
+        if (!weapon.limitedMagazines) id.bulletsLeftInMagazine = weapon.magazineSize;
+        else
+        {
+            if (id.totalBullets > weapon.magazineSize) // You can still reload a full magazine
+            {
+                id.totalBullets = id.totalBullets - (weapon.magazineSize - id.bulletsLeftInMagazine);
+                id.bulletsLeftInMagazine = weapon.magazineSize;
+            }
+            else if (id.totalBullets == weapon.magazineSize) // You can only reload a single full magazine more
+            {
+                id.totalBullets = id.totalBullets - (weapon.magazineSize - id.bulletsLeftInMagazine);
+                id.bulletsLeftInMagazine = weapon.magazineSize;
+            }
+            else if (id.totalBullets < weapon.magazineSize ) // You cant reload a whole magazine
+            {
+                int bulletsLeft = id.bulletsLeftInMagazine;
+                if (id.bulletsLeftInMagazine + id.totalBullets <= weapon.magazineSize)
+                {
+                    id.bulletsLeftInMagazine = id.bulletsLeftInMagazine + id.totalBullets;
+                    if (id.totalBullets - (weapon.magazineSize - bulletsLeft) >= 0) id.totalBullets = id.totalBullets - (weapon.magazineSize - bulletsLeft);
+                    else id.totalBullets = 0;
+                }
+                else
+                {
+                    int ToAdd = weapon.magazineSize - id.bulletsLeftInMagazine;
+                    id.bulletsLeftInMagazine = id.bulletsLeftInMagazine + ToAdd;
+                    if (id.totalBullets - ToAdd >= 0) id.totalBullets = id.totalBullets - ToAdd;
+                    else id.totalBullets = 0;
+                }       
+            }
+        }
+    }
+    public void SelectWeapon()
+    {
+        canShoot = false;
+        selectingWeapon = true;
+        //crosshair.SpotEnemy(false);
+        events.OnInventorySlotChanged.Invoke(); // Invoke your custom method
+        weapon = null;
+        // Spawn the appropriate weapon in the inventory
+
+        foreach (GameObject weapon_ in inventory)
+        {
+            if (weapon_ != null)
+            {
+                weapon_.SetActive(false);
+                weapon_.GetComponent<Animator>().enabled = false;
+            }
+
+            if (weapon_ == inventory[currentWeapon] && weapon_ != null)
+            {
+                weapon_.GetComponent<Animator>().enabled = true;
+                UnHolster(weapon_);
+            }
+        }
+        
+        // Handle the UI Animations
+        // foreach (UISlot slot in slots)
+        // {
+        //     slot.transform.localScale = slot.initScale;
+        //     slot.GetComponent<CanvasGroup>().alpha = .2f;
+        // }
+        // slots[currentWeapon].transform.localScale = slots[currentWeapon].transform.localScale * 1.2f;
+        // slots[currentWeapon].GetComponent<CanvasGroup>().alpha = 1;
+    }
+
     void destroyCurrentWeapon()
     {
         if (id != null)
@@ -487,6 +599,11 @@ public class WeaponController : NetworkBehaviour
             weapon = null;
             firePoint = null;
         }
+    }
+
+    void hideCurrentWeapon()
+    {
+        
     }
 
     public void dropCurrentWeapon()
@@ -499,7 +616,6 @@ public class WeaponController : NetworkBehaviour
     {
         if (weapon == null) return;
         StartCoroutine(dropWeapon());
-        
     }
 
     [Command(requiresAuthority = false)]
@@ -538,20 +654,13 @@ public class WeaponController : NetworkBehaviour
             return;
         }
         
-        GameObject thePickUp=null;
-        foreach (GameObject pickup in weaponPickUpDictionary)
-        {
-            if (pickup.GetComponent<WeaponPickable>().weapon.weaponID == weaponId)
-            {
-                thePickUp = pickup;
-                break;
-            }
-        }
-        
+        GameObject thePickUp=weaponPickUpPrefab;
+
         if (thePickUp != null)
         {
             thePickUp = Instantiate(thePickUp,weaponHolder.position,transform.rotation);
             WeaponPickable pick = thePickUp.GetComponent<WeaponPickable>();
+            pick.weapon = weapon;
             pick.bulletsLeftInMagazine = bulletLet;
             pick.totalBullets = totalBullet;
             pick.allowToDestroy = true;
@@ -561,12 +670,12 @@ public class WeaponController : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    void RpcDestroyCurrentWeapon()
-    {
-        if(id==null || weapon==null)return;
-        destroyCurrentWeapon();
-    }
+    // [ClientRpc]
+    // void RpcDestroyCurrentWeapon()
+    // {
+    //     if(id==null || weapon==null)return;
+    //     destroyCurrentWeapon();
+    // }
     
     [ServerCallback]
     private IEnumerator dropWeapon()
@@ -622,6 +731,30 @@ public class WeaponController : NetworkBehaviour
 
     private void HandleUI()
     {
-        
+        if (id!=null)
+        {
+            if (!weaponUIObject.activeSelf)
+            {
+                weaponUIObject.SetActive(true);
+            }
+
+            string bulletInfo = id.weapon.infiniteBullets ? Mathf.Infinity.ToString() : id.totalBullets.ToString();
+            weaponTitle.text = $"<color=#9c1029>{id.weapon._name}</color>";
+            bulletTMPText.text = $"{id.bulletsLeftInMagazine}/{bulletInfo}";
+            if (id.weapon.icon != null)
+            {
+                Image iconImage = weaponIcon.GetComponent<Image>();
+                iconImage.sprite = id.weapon.icon;
+            }
+            else
+            {
+                Image iconImage = weaponIcon.GetComponent<Image>();
+                iconImage.sprite = defaultIcon;
+            }
+        }
+        else
+        {
+            weaponUIObject.SetActive(false);
+        }
     }
 }

@@ -46,7 +46,7 @@ public class CharacterHealthState : NetworkBehaviour,IDamageable
 
     void onCurrentHealthChanged(float oldValue,float newValue)
     {
-        onDamaged();
+        onHealthChanged();
 
         float ratio = (float)Math.Round(newValue / Health,2);
         if (showWorldSpaceHealthBar)
@@ -63,7 +63,7 @@ public class CharacterHealthState : NetworkBehaviour,IDamageable
         }
     }
 
-    public virtual void onDamaged()
+    public virtual void onHealthChanged()
     {
     }
 

@@ -317,8 +317,11 @@ public class MyNetworkManager : NetworkManager
                 roomPlayer.GetComponent<roomPlayerInstance>().isHost = true;
                 Debug.Log($"connection {conn.connectionId} is host");
         }
+        Debug.LogWarning($"player name {"player"+readyRoomSlot.Count}");
         roomPlayer.GetComponent<roomPlayerInstance>().userName = "player " + readyRoomSlot.Count;
-
+        
+        checkPlayerReadyState();
+        
         Messages.RoomInstanceMessage roomInstance;
         roomInstance.conn=conn;
         roomInstance.roomPlayer = gameObject;
@@ -351,6 +354,16 @@ public class MyNetworkManager : NetworkManager
             {
                 if (roomInstance.conn.connectionId == conn.connectionId)
                     ReadyRoom.Remove(roomInstance);
+                    break;
+            }
+
+            foreach (roomPlayerInstance client in readyRoomSlot)
+            {
+                if (conn.connectionId == client.connectionToClient.connectionId)
+                {
+                    readyRoomSlot.Remove(client);
+                    break;
+                }
             }
         }
     }
@@ -583,14 +596,14 @@ public class MyNetworkManager : NetworkManager
             }
         }
     }
-
-    [Server]
+    
     public void checkPlayerReadyState()
     {
-        int currentPlayerNum = ReadyRoom.Count;
+        int currentPlayerNum = readyRoomSlot.Count;
         int readyPlayerNum = 0;
         roomPlayerInstance hostPlayer=null;
         NetworkConnection hostConnection=null;
+        Debug.LogWarning($"current player number: {currentPlayerNum}");
         foreach (roomPlayerInstance roomPlayer in readyRoomSlot)
         {
             if (roomPlayer.isReady)
@@ -604,7 +617,10 @@ public class MyNetworkManager : NetworkManager
             }
             
         }
-        if ((hostPlayer!=null && hostConnection!= null)&&(readyPlayerNum == currentPlayerNum && readyPlayerNum >= miniNumOfPlayer))
+        
+        if(hostPlayer==null)return;
+        
+        if (readyPlayerNum == currentPlayerNum && currentPlayerNum >= miniNumOfPlayer)
         {
             hostPlayer.RpcAllClientReady(hostPlayer.connectionToClient,true);
         }

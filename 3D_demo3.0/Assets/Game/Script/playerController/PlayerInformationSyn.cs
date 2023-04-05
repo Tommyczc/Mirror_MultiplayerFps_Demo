@@ -65,9 +65,9 @@ public class PlayerInformationSyn:CharacterHealthState
         }
     }
 
-    public override void onDamaged()
+    public override void onHealthChanged()
     {
-        base.onDamaged();
+        base.onHealthChanged();
         if (showScreenSpaceHealthBar&&healthScreenSlider!=null)
         {
             float ratio = (float)Math.Round(currentHealth / Health,2);

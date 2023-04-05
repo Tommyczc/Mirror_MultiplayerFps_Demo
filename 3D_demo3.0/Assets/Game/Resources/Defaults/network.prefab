@@ -65,8 +65,6 @@ MonoBehaviour:
   - {fileID: 8824714245882031917, guid: 416749c3cf0a0a647a53cc99ea37117f, type: 3}
   - {fileID: 5750209467147981476, guid: a274b75d3a6845942aa028024eaf770d, type: 3}
   - {fileID: 4120771171582026541, guid: ecd7bc3aba61a8d4c9490826661609ee, type: 3}
-  - {fileID: 4120771171582026541, guid: 2157bad3b49782648a8dea592fd362a3, type: 3}
-  - {fileID: 4120771171582026541, guid: 6463dc83f4da9114c8268da2d00cd631, type: 3}
   timeInterpolationGui: 1
   readyRoomSlot: []
   gameRoomSlot: []

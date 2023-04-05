@@ -26,6 +26,7 @@ public class roomPlayerInstance : NetworkBehaviour
         DontDestroyOnLoad(this);
         MyNetworkManager.singleton.readyRoomSlot.Add(this);
         onGui();
+        GameManager._events.newPlayerEnterAction.Invoke();
     }
 
     // Update is called once per frame
@@ -38,17 +39,16 @@ public class roomPlayerInstance : NetworkBehaviour
     {
         
     }
-
-    public void hello()
-    {
-        Debug.Log("hello");
-    }
-
+    
     public override void OnStartLocalPlayer()
     {
         isLocal = true;
         MyNetworkManager.singleton.currentRoomInstance = this;
-        //CmdChangeReadyState(false);
+    }
+
+    public override void OnStartServer()
+    {
+        
     }
 
     #region syncvar field
@@ -106,8 +106,12 @@ public class roomPlayerInstance : NetworkBehaviour
         }
     }
 
-    
-    
+    [Command]
+    public void CmdCheckReadyState()
+    {
+        MyNetworkManager.singleton.checkPlayerReadyState();
+    }
+
     [Command]
     public void CmdChangeUsername(string name)
     {
@@ -134,7 +138,7 @@ public class roomPlayerInstance : NetworkBehaviour
     {
         if (isHost&isLocalPlayer)
         {
-            Debug.LogWarning(readyState);
+            Debug.LogWarning($"all player ready state: {readyState}");
             GameManager._events.allPlayerReadyAction.Invoke(readyState);
         }
     }
